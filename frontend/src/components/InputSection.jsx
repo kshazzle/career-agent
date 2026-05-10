@@ -38,10 +38,12 @@ function CardHeader({ label, toggle }) {
 }
 
 const TA_CLASS = [
-  'w-full flex-1 bg-transparent text-white/90',
-  'font-mono text-[13px] leading-[1.7]',
+  'w-full flex-1 min-h-[240px] bg-transparent',
+  'text-[color:var(--cinema-cream-soft)]',
+  'font-mono text-[13px] leading-[1.75]',
   'resize-none outline-none border-none',
-  'placeholder:text-white/30 placeholder:font-sans placeholder:text-[13px]',
+  'placeholder:text-[rgba(247,242,234,0.32)] placeholder:font-sans placeholder:text-[13px]',
+  'caret-[color:var(--cinema-gold-bright)] selection:bg-[rgba(196,168,106,0.22)]',
 ].join(' ');
 
 export default function InputSection({
@@ -76,11 +78,11 @@ export default function InputSection({
               onClick={() => !loading && fileRef.current?.click()}
               className={[
                 'flex flex-col items-center justify-center gap-3 min-h-[220px]',
-                'm-4 border border-dashed border-white/15 rounded-xl',
-                'transition-all duration-200',
+                'm-4 border border-dashed border-[rgba(232,213,168,0.18)] rounded-[14px]',
+                'transition-all duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
                 loading
                   ? 'opacity-40 cursor-not-allowed'
-                  : 'cursor-pointer hover:border-white/30 hover:bg-white/[0.02]',
+                  : 'cursor-pointer hover:border-[rgba(196,168,106,0.42)] hover:bg-[rgba(196,168,106,0.06)]',
               ].join(' ')}
             >
               <input
@@ -93,18 +95,18 @@ export default function InputSection({
               <div className={[
                 'w-11 h-11 rounded-xl flex items-center justify-center border',
                 resumeFile
-                  ? 'bg-white/10 border-white/20 text-white'
-                  : 'bg-white/[0.04] border-white/10 text-white/50',
+                  ? 'bg-[rgba(196,168,106,0.14)] border-[rgba(232,213,168,0.35)] text-[color:var(--cinema-cream)]'
+                  : 'bg-[rgba(12,10,8,0.5)] border-[rgba(247,242,234,0.12)] text-[rgba(247,242,234,0.45)]',
               ].join(' ')}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                   <path d="M9 12V3M9 3l-4 4M9 3l4 4M3 13v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
               <div className="text-center">
-                <p className="text-[13px] font-medium text-white/85">
+                <p className="text-[13px] font-medium text-[color:var(--cinema-cream-soft)]">
                   {resumeFile ? resumeFile.name : 'Upload PDF'}
                 </p>
-                <p className="text-[11px] text-white/40 mt-1">
+                <p className="text-[11px] text-[rgba(247,242,234,0.38)] mt-1">
                   {resumeFile ? 'Click to change' : 'Click to browse'}
                 </p>
               </div>
@@ -151,8 +153,7 @@ export default function InputSection({
                   onChange={(e) => setJdUrl(e.target.value)}
                   disabled={loading}
                   className={[
-                    'font-mono text-[13px] text-white/92',
-                    'placeholder:text-white/35 placeholder:font-sans',
+                    'font-mono text-[13px]',
                     'disabled:opacity-40',
                   ].join(' ')}
                 />
@@ -177,7 +178,7 @@ export default function InputSection({
         >
           {loading ? (
             <>
-              <span className="w-3.5 h-3.5 border-[1.5px] border-white/25 border-t-white rounded-full spin flex-shrink-0" />
+              <span className="w-3.5 h-3.5 border-[1.5px] border-[rgba(247,242,234,0.25)] border-t-[rgba(232,213,168,0.95)] rounded-full spin flex-shrink-0" />
               Optimizing
             </>
           ) : (
@@ -190,12 +191,12 @@ export default function InputSection({
           )}
         </button>
 
-        <span className="text-[11.5px] text-white/35 max-w-[280px] text-center leading-relaxed">
+        <span className="text-[11.5px] text-[rgba(247,242,234,0.38)] max-w-[280px] text-center leading-relaxed">
           {loading ? (
-            <span className="text-white/45">Usually takes a few seconds.</span>
+            <span className="text-[rgba(247,242,234,0.48)]">Usually takes a few seconds.</span>
           ) : canSubmit ? (
-            <span className="inline-flex items-center gap-1.5 text-emerald-400/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot" />
+            <span className="inline-flex items-center gap-1.5 text-[rgba(232,213,168,0.88)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[rgba(196,168,106,0.95)] pulse-dot shadow-[0_0_10px_rgba(196,168,106,0.45)]" />
               Ready to optimize
             </span>
           ) : (

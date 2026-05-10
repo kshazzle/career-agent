@@ -1,9 +1,11 @@
 import os
+from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Response, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from models import OptimizeRequest, OptimizeResponse
@@ -17,6 +19,9 @@ if not os.getenv("OPENROUTER_API_KEY"):
         "OPENROUTER_API_KEY is not set. Copy .env.example to .env and add your key."
     )
 
+ROOT = Path(__file__).resolve().parent.parent
+DIST_DIR = ROOT / "frontend" / "dist"
+
 app = FastAPI(title="OfferForge API", version="1.0.0")
 
 app.add_middleware(
@@ -26,15 +31,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+api = APIRouter(prefix="/api")
 
 
-# ── Existing text-only flow ──────────────────────────────────────────────────
-
-@app.post("/optimize", response_model=OptimizeResponse)
+@api.post("/optimize", response_model=OptimizeResponse)
 async def optimize_endpoint(req: OptimizeRequest):
     if not req.resume.strip():
         raise HTTPException(status_code=400, detail="Resume cannot be empty.")
@@ -51,16 +51,13 @@ async def optimize_endpoint(req: OptimizeRequest):
     )
 
 
-# ── PDF + URL flow ────────────────────────────────────────────────────────���──
-
-@app.post("/optimize/upload", response_model=OptimizeResponse)
+@api.post("/optimize/upload", response_model=OptimizeResponse)
 async def optimize_upload(
     resume_text: Optional[str] = Form(None),
     resume_file: Optional[UploadFile] = File(None),
     jd_text: Optional[str] = Form(None),
     jd_url: Optional[str] = Form(None),
 ):
-    # Resolve resume
     if resume_file:
         content = await resume_file.read()
         if not content:
@@ -76,7 +73,6 @@ async def optimize_upload(
     else:
         raise HTTPException(status_code=400, detail="Provide resume_file or resume_text.")
 
-    # Resolve job description
     if jd_url and jd_url.strip():
         try:
             jd = fetch_jd_from_url(jd_url.strip())
@@ -99,13 +95,11 @@ async def optimize_upload(
     )
 
 
-# ── PDF generation ───────────────────────────────────────────────────────────
-
 class PdfRequest(BaseModel):
     text: str
 
 
-@app.post("/pdf")
+@api.post("/pdf")
 async def download_pdf(req: PdfRequest):
     if not req.text.strip():
         raise HTTPException(status_code=400, detail="Text cannot be empty.")
@@ -119,3 +113,15 @@ async def download_pdf(req: PdfRequest):
         media_type="application/pdf",
         headers={"Content-Disposition": 'attachment; filename="optimized-resume.pdf"'},
     )
+
+
+app.include_router(api)
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+if DIST_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=str(DIST_DIR), html=True), name="spa")

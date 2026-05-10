@@ -1,0 +1,13 @@
+# Render Blueprint — https://render.com/docs/infrastructure-as-code
+services:
+  - type: web
+    name: offerforge
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: OPENROUTER_API_KEY
+        sync: false

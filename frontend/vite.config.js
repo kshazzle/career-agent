@@ -6,10 +6,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
+      // Same path as production: FastAPI serves /api/* and static SPA on /
+      '/api': { target: 'http://localhost:8000' },
     },
   },
 })
