@@ -1,0 +1,27 @@
+# Environment & secrets (never commit real keys)
+.env
+**/.env
+
+# Dependencies & builds
+node_modules/
+dist/
+build/
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+
+# IDE / OS
+.DS_Store
+.idea/
+*.swp
+*.swo
+
+# Local agent / tooling (optional local state)
+.claude/
