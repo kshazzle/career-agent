@@ -19,9 +19,14 @@ _client = None
 def get_client() -> OpenAI:
     global _client
     if _client is None:
+        key = os.getenv("OPENROUTER_API_KEY")
+        if not key:
+            raise RuntimeError(
+                "OPENROUTER_API_KEY is not set. Add it in Render → Environment (or .env locally)."
+            )
         _client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
-            api_key=os.environ["OPENROUTER_API_KEY"],
+            api_key=key,
         )
     return _client
 

@@ -14,11 +14,6 @@ from pdf_utils import extract_text_from_pdf, fetch_jd_from_url, generate_resume_
 
 load_dotenv()
 
-if not os.getenv("OPENROUTER_API_KEY"):
-    raise RuntimeError(
-        "OPENROUTER_API_KEY is not set. Copy .env.example to .env and add your key."
-    )
-
 ROOT = Path(__file__).resolve().parent.parent
 DIST_DIR = ROOT / "frontend" / "dist"
 
@@ -41,7 +36,7 @@ async def optimize_endpoint(req: OptimizeRequest):
     if not req.job_description.strip():
         raise HTTPException(status_code=400, detail="Job description cannot be empty.")
 
-    optimized, missing = optimize(req.resume, req.job_description)
+    optimized, missing = _optimize_safe(req.resume, req.job_description)
     score = compute_match_score(optimized, req.job_description)
 
     return OptimizeResponse(
@@ -85,7 +80,7 @@ async def optimize_upload(
     else:
         raise HTTPException(status_code=400, detail="Provide jd_url or jd_text.")
 
-    optimized, missing = optimize(resume, jd)
+    optimized, missing = _optimize_safe(resume, jd)
     score = compute_match_score(optimized, jd)
 
     return OptimizeResponse(
@@ -116,6 +111,17 @@ async def download_pdf(req: PdfRequest):
 
 
 app.include_router(api)
+
+
+def _optimize_safe(resume: str, jd: str):
+    """Optimize with a clear HTTP error when LLM is not configured."""
+    try:
+        return optimize(resume, jd)
+    except RuntimeError as e:
+        msg = str(e)
+        if "OPENROUTER" in msg.upper():
+            raise HTTPException(status_code=503, detail=msg) from e
+        raise
 
 
 @app.get("/health")
